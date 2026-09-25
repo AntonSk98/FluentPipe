@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Wortschatz</title>
+    <style>
+        body {
+            font-family: 'DejaVu Sans', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            color: #111111;
+            background-color: #ffffff;
+            line-height: 1.4;
+
+            font-size: 14px;
+        }
+
+        table.header-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        td.logo-cell {
+            width: 60%;
+            color: #357C78;
+            font-size: 1.9em;
+            font-weight: bold;
+            line-height: 1.15;
+            letter-spacing: -0.3px;
+            padding-bottom: 14px;
+        }
+
+        td.date-cell {
+            width: 40%;
+            text-align: right;
+            vertical-align: bottom;
+            font-size: 0.95em;
+            color: #999999;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+            padding-bottom: 14px;
+        }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        table.data-table th {
+            color: #357C78;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            padding: 0 12px 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #357C78;
+        }
+
+        th.col-1 {
+            width: 28%;
+        }
+
+        th.col-2 {
+            width: 24%;
+        }
+
+        th.col-3 {
+            width: 48%;
+        }
+
+        table.data-table td {
+            padding: 0 12px;
+            vertical-align: top;
+        }
+
+        table.data-table td + td,
+        table.data-table th + th {
+            padding-left: 24px;
+        }
+
+        tr.row-word td {
+            padding-top: 20px;
+            padding-bottom: 7px;
+        }
+
+        .word-german {
+            color: #357C78;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+
+        .word-english {
+            font-size: 1.05em;
+            font-weight: bold;
+        }
+
+        .word-meaning {
+            font-size: 0.95em;
+            color: #666666;
+        }
+
+        tr.row-freq td {
+            padding-bottom: 11px;
+            font-size: 0.95em;
+            color: #666666;
+        }
+
+        .star-filled {
+            color: #357C78;
+        }
+
+        .star-empty {
+            color: #bbbbbb;
+        }
+
+        tr.row-ex-de td {
+            padding-bottom: 3px;
+            font-size: 0.95em;
+            color: #111111;
+        }
+
+        tr.row-ex-en td {
+            padding-bottom: 16px;
+            font-size: 0.9em;
+            font-style: italic;
+            color: #888888;
+            border-bottom: 1px solid #357C78;
+        }
+
+        .icon-de {
+            color: #357C78;
+            font-size: 0.85em;
+            margin-right: 5px;
+        }
+
+        .icon-en {
+            color: #cccccc;
+            font-size: 0.85em;
+            margin-right: 5px;
+        }
+
+        .footer {
+            margin-top: 15px;
+            text-align: right;
+            font-size: 0.85em;
+            color: #999999;
+        }
+
+        .footer-channel {
+            /*color: #357C78;*/
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<table class="header-table">
+    <tr>
+        <td class="logo-cell">
+            Daily<br/>Deutsch
+        </td>
+        <td class="date-cell">
+            <span th:text="${#calendars.format(#calendars.createNow(), 'dd. MMMM yyyy')}"></span>
+        </td>
+    </tr>
+</table>
+
+<!-- Main Word List -->
+<table class="data-table">
+    <thead>
+    <tr>
+        <th class="col-1">Wort</th>
+        <th class="col-2">Übersetzung</th>
+        <th class="col-3">Bedeutung</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="word : ${wordCard.words}">
+
+        <tr class="row-word">
+            <td>
+                <div class="word-german" th:text="${word.word}"></div>
+            </td>
+            <td>
+                <div class="word-english" th:text="${word.translation}"></div>
+            </td>
+            <td>
+                <div class="word-meaning" th:text="${word.meaning}"></div>
+            </td>
+        </tr>
+
+        <tr class="row-freq" th:if="${word.frequency != null}">
+            <td colspan="3">
+                Worthäufigkeit:
+                <span th:each="i : ${#numbers.sequence(1, 5)}"
+                      th:text="${i <= word.frequency} ? '★' : '☆'"
+                      th:class="${i <= word.frequency} ? 'star-filled' : 'star-empty'">
+                </span>
+            </td>
+        </tr>
+
+        <tr class="row-ex-de" th:if="${word.example != null && !word.example.isEmpty()}">
+            <td colspan="3">
+                <span class="icon-de">&#9673;</span>
+                <span th:text="${word.example}"></span>
+            </td>
+        </tr>
+
+        <tr class="row-ex-en" th:if="${word.exampleTranslation != null && !word.exampleTranslation.isEmpty()}">
+            <td colspan="3">
+                <span class="icon-en">&#9673;</span>
+                <span th:text="${word.exampleTranslation}"></span>
+            </td>
+        </tr>
+
+    </th:block>
+    </tbody>
+</table>
+
+<!-- Footer Section -->
+<div class="footer">
+    <span class="footer-channel">@daily_deutsch_group</span>
+</div>
+
+</body>
+</html>
