@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.audio.tts.TextToSpeechPrompt;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiAudioSpeechModel;
-import org.springframework.ai.openai.OpenAiAudioSpeechOptions;
 import org.springframework.stereotype.Service;
 
 import javax.sound.sampled.AudioFormat;
@@ -61,8 +60,8 @@ public class AiClientImpl implements AiClient {
 
     @Override
     public byte[] synthesizeWordCardAudio(Collection<String> words) {
-        // Ellipses create natural pauses between German words in gpt-4o-mini-tts
-        String promptText = String.join("...\n—\n\n", words);
+        // Joining words with a period and space creates natural pauses between list items
+        String promptText = String.join(". ", words) + ".";
 
         // Spring AI automatically injects options defined in application.properties
         return audioSpeechModel.call(new TextToSpeechPrompt(promptText))

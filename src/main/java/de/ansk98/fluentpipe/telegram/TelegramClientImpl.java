@@ -137,11 +137,15 @@ public class TelegramClientImpl implements TelegramClient {
     }
 
     private void publishAudioReply(String channelId, Integer replyToMessageId, byte[] audio) {
-        InputFile audioFile = new InputFile(new ByteArrayInputStream(audio), "aussprache.wav");
+        InputFile audioFile = new InputFile(
+                new ByteArrayInputStream(audio),
+                "daily_deutsch_aussprache.wav"
+        );
 
         SendAudio sendAudio = SendAudio.builder()
                 .chatId(channelId)
                 .audio(audioFile)
+                .performer("@daily_deutsch_group")
                 .replyParameters(ReplyParameters.builder()
                         .messageId(replyToMessageId)
                         .build())

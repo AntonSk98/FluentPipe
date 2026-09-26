@@ -20,7 +20,7 @@ public class WordCard {
 
     @JoinColumn(name = "word_card_id")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private final List<Word> words = new ArrayList<>();
+    private List<Word> words = new ArrayList<>();
 
     private boolean published;
 

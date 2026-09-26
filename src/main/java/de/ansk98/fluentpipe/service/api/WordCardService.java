@@ -22,14 +22,6 @@ public interface WordCardService {
     WordDto addWordToCard(AddWordCommand command);
 
     /**
-     * Returns all words from a non-published word card.
-     *
-     * @param ownerId owner id
-     * @return word card
-     */
-    WordCardDto fetchNotPublishedWordCard(String ownerId);
-
-    /**
      * Returns the currently not published word card of a user.
      *
      * @param command command

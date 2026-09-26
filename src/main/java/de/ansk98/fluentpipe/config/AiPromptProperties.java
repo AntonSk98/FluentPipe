@@ -17,8 +17,9 @@ public record AiPromptProperties(PromptTemplates prompts) {
      *
      * @param analyzeWord the prompt template used to analyze a word and derive its
      *                    translation, definition, usage frequency and an example sentence
+     * @param aiWordCard  the prompt to generate a word card
      */
-    public record PromptTemplates(String analyzeWord) {
+    public record PromptTemplates(String analyzeWord, String aiWordCard) {
     }
 
     /**

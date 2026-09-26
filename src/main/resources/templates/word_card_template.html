@@ -75,6 +75,8 @@
         table.data-table td {
             padding: 0 12px;
             vertical-align: top;
+            /* Prevents horizontal overflow in fixed table layout */
+            word-wrap: break-word;
         }
 
         table.data-table td + td,
@@ -91,6 +93,8 @@
             color: #357C78;
             font-weight: bold;
             font-size: 1.05em;
+            /* OpenHtmlToPdf only honours word-wrap (not overflow-wrap / word-break) */
+            word-wrap: break-word;
         }
 
         .word-english {

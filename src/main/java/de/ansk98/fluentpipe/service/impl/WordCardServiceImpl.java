@@ -48,11 +48,6 @@ public class WordCardServiceImpl implements WordCardService {
     }
 
     @Override
-    public WordCardDto fetchNotPublishedWordCard(String ownerId) {
-        return WordCardDto.from(fetchOrCreateNotPublishedWordCard(ownerId).getWords());
-    }
-
-    @Override
     public boolean removeWordFromCard(DeleteWordCommand command) {
         return fetchNotPublishedCard(command.ownerId())
                 .map(card -> removeWord(card, command.word()))
@@ -86,7 +81,7 @@ public class WordCardServiceImpl implements WordCardService {
 
     @Override
     public WordCardDto fetchActiveWordCard(FetchActiveWordCardCommand command) {
-        return fetchNotPublishedWordCard(command.ownerId());
+        return WordCardDto.from(fetchOrCreateNotPublishedWordCard(command.ownerId()).getWords());
     }
 
     private Optional<WordCard> fetchNotPublishedCard(String ownerId) {
