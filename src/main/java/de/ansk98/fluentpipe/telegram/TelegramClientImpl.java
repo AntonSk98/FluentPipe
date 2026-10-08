@@ -146,6 +146,7 @@ public class TelegramClientImpl implements TelegramClient {
                 .chatId(channelId)
                 .audio(audioFile)
                 .performer("@daily_deutsch_group")
+                .title("Wortschatz")
                 .replyParameters(ReplyParameters.builder()
                         .messageId(replyToMessageId)
                         .build())

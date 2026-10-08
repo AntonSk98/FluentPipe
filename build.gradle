@@ -25,6 +25,7 @@ ext {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-flyway'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.ai:spring-ai-starter-model-openai'
     implementation 'org.hibernate.orm:hibernate-community-dialects'
