@@ -4,6 +4,8 @@ import de.ansk98.fluentpipe.service.api.TelegramClient;
 import de.ansk98.fluentpipe.service.api.commands.PublishWordCardWithAudioCommand;
 import de.ansk98.fluentpipe.service.api.commands.SendImagesWithCaptionCommand;
 import de.ansk98.fluentpipe.service.api.commands.SendMessageCommand;
+import de.ansk98.fluentpipe.service.api.commands.SendNewsFeedCommand;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
@@ -14,6 +16,9 @@ import org.telegram.telegrambots.meta.api.objects.ReplyParameters;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -42,6 +47,11 @@ public class TelegramClientImpl implements TelegramClient {
         this.client = client;
     }
 
+    @EventListener(SendNewsFeedCommand.class)
+    public void onSendNewsFeedCommand(SendNewsFeedCommand command) {
+        sendNewsFeed(command);
+    }
+
     @Override
     public void sendMessage(SendMessageCommand sendMessageCommand) {
         SendMessage sendMessage = new SendMessage(sendMessageCommand.channelId(), sendMessageCommand.message());
@@ -68,6 +78,39 @@ public class TelegramClientImpl implements TelegramClient {
 
         if (parentMessage != null && command.audio() != null) {
             publishAudioReply(command.channelId(), parentMessage.getMessageId(), command.audio());
+        }
+    }
+
+    @Override
+    public void sendNewsFeed(SendNewsFeedCommand command) {
+        String sourceHashtag = "#" + command.sourceTag().replaceAll("\\s+", "");
+
+        String newsFeedPreview =
+                String.format("<b>%s</b>\n\n", command.title()) +
+                        String.format("%s\n\n", command.description()) +
+                        String.format("%s", sourceHashtag);
+
+        InlineKeyboardButton urlKeyboardButton = InlineKeyboardButton.builder()
+                .text("📖 Weiterlesen")
+                .url(command.feedUrl())
+                .build();
+
+        InlineKeyboardMarkup keyboard = InlineKeyboardMarkup.builder()
+                .keyboardRow(new InlineKeyboardRow(urlKeyboardButton))
+                .build();
+
+        SendMessage sendMessage = SendMessage.builder()
+                .chatId(command.channelId())
+                .text(newsFeedPreview)
+                .parseMode("HTML")
+                .replyMarkup(keyboard)
+                .build();
+
+
+        try {
+            client.execute(sendMessage);
+        } catch (TelegramApiException e) {
+            throw new IllegalStateException("Failed to send news feed", e);
         }
     }
 

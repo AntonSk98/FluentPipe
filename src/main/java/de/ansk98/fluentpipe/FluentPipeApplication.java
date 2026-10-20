@@ -3,6 +3,7 @@ package de.ansk98.fluentpipe;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.integration.config.EnableIntegration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -11,9 +12,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author ansk98
  */
 @EnableScheduling
+@EnableIntegration
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class FluentPipeApplication {
+
 
     /**
      * Main entry point.

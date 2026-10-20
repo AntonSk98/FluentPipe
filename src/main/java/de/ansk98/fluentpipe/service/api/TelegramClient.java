@@ -3,6 +3,7 @@ package de.ansk98.fluentpipe.service.api;
 import de.ansk98.fluentpipe.service.api.commands.PublishWordCardWithAudioCommand;
 import de.ansk98.fluentpipe.service.api.commands.SendImagesWithCaptionCommand;
 import de.ansk98.fluentpipe.service.api.commands.SendMessageCommand;
+import de.ansk98.fluentpipe.service.api.commands.SendNewsFeedCommand;
 
 /**
  * Defines a technology-agnostic client abstraction for sending messages,
@@ -40,4 +41,11 @@ public interface TelegramClient {
      * @param publishWordCardWithAudioCommand command
      */
     void publishWordCardWithAudio(PublishWordCardWithAudioCommand publishWordCardWithAudioCommand);
+
+    /**
+     * Command to send news feed to a channel.
+     *
+     * @param sendNewsFeedCommand command
+     */
+    void sendNewsFeed(SendNewsFeedCommand sendNewsFeedCommand);
 }
