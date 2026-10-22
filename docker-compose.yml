@@ -1,0 +1,13 @@
+# To build the image locally: docker build -t fluentpipe:latest .
+services:
+  fluentpipe:
+    image: fluentpipe:latest
+    container_name: fluentpipe
+    env_file:
+      - .env
+    volumes:
+      - fluentpipe-data:/data
+    restart: unless-stopped
+
+volumes:
+  fluentpipe-data:
