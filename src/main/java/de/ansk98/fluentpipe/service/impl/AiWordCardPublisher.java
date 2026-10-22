@@ -15,7 +15,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
@@ -66,14 +65,15 @@ public class AiWordCardPublisher {
 
     @Scheduled(cron = "0 0 8,17 * * *")
     public void publishAiDrivenWordCard() {
+        LocalDate today = LocalDate.now();
+
         wordCardService.clearNotPublishedWordCard(AI_OWNER_ID);
 
         List<String> toBeAddedWords = aiClient.execute(
                 aiPromptProperties.prompts().aiWordCard(),
                 Map.of(
-                        "DAY_OF_WEEK", LocalDate.now().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMANY),
-                        "TODAY_DATE", LocalDate.now().toString(),
-                        "TIME_SLOT", LocalTime.now().getHour() < 12 ? "MORNING_LESSON" : "EVENING_LESSON",
+                        "DAY_OF_WEEK", today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.GERMANY),
+                        "TODAY_DATE", today.toString(),
                         "RANDOM_SEED", UUID.randomUUID().toString()
                 ),
                 List.class);

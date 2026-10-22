@@ -179,6 +179,9 @@ Models, prompts, schedules, feeds and channel settings live in `application.yml`
 overridden the usual Spring way, for example through environment variables. Nothing is tied to a
 specific provider model or cadence. Change the configuration, not the code.
 
+`fluentpipe.timezone` sets the JVM default timezone at startup, so scheduling and all generated
+content share the same clock regardless of the container's default UTC.
+
 ## Under the hood (for geeks)
 
 - **Spring Boot + Spring AI** for the orchestration and LLM integration
