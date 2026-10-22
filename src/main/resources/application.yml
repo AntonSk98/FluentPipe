@@ -1,0 +1,116 @@
+spring.application.name: FluentPipe
+
+spring.datasource.url: ${SPRING_DATASOURCE_URL}
+spring.datasource.driver-class-name: org.sqlite.JDBC
+
+spring.jpa.database-platform: org.hibernate.community.dialect.SQLiteDialect
+spring.jpa.hibernate.ddl-auto: validate
+
+spring.flyway.enabled: true
+spring.flyway.locations: classpath:db/migration
+spring.flyway.baseline-on-migrate: true
+spring.flyway.baseline-version: 0
+
+spring.integration.jdbc.initialize-schema: never
+
+fluentpipe:
+  metadata-store:
+    base-directory: ${METADATA_STORE_BASE_DIR}
+
+spring.ai.openai.api-key: ${SPRING_AI_OPENAI_API_KEY}
+spring.ai.openai.chat.model: gpt-5.6-luna
+spring.ai.openai.audio.speech.options.model: gpt-4o-mini-tts
+spring.ai.openai.audio.speech.options.voice: nova
+spring.ai.openai.audio.speech.options.response-format: wav
+spring.ai.openai.audio.speech.options.speed: 1
+spring.ai.openai.audio.speech.instructions: You are a native German speaker. Speak in standard German with accurate German accent and pronunciation. Keep one second pause between each word separated by comma, this is crucial.
+
+ai:
+  prompts:
+    analyze-word: |
+      You are a language learning assistant and expert lexicographer.
+
+      Analyze the given input word or phrase and provide its translation, usage frequency, and a context sentence with its translation.
+      No matter in what language a word or a phrase is provided, the main thing is that it is always translated to the target language.
+
+      Input Word: "${INPUT_WORD}"
+      Target Language: German
+      Native Language: English
+
+      RULES:
+      1. "word": The base/dictionary form of the input word ALWAYS in the target language.
+      2. "translation": Clear, accurate translation in the native language.
+      3. "meaning": A concise definition/explanation of the word in the native language.
+      4. "frequency": Classify the real-world usage frequency into exactly ONE of these values:
+                        - VERY_RARE
+                        - RARE
+                        - MODERATE
+                        - OFTEN
+                        - VERY_OFTEN
+      5. "example": A natural, everyday example sentence in the target language using the word.
+      6. "exampleTranslation": Accurate translation of the example sentence in the native language.
+
+      Respond ONLY with valid JSON matching this exact structure:
+        {
+          "word": "string",
+          "translation": "string",
+          "meaning": "string",
+          "frequency": "VERY_RARE | RARE | MODERATE | OFTEN | VERY_OFTEN",
+          "example": "string",
+          "exampleTranslation": "string"
+        }
+
+    ai-word-card: |
+      You are a native German language teacher.
+      Today is ${DAY_OF_WEEK},${TODAY_DATE}.
+      Execution Entropy Seed: ${RANDOM_SEED}
+
+      STEP 1: DYNAMIC TOPIC SELECTION
+      - Use the execution seed (${RANDOM_SEED}) as a hash to force picking a completely unique, non-obvious sub-topic.
+      - Choose one specific situational niche relevant to everyday life in Germany (e.g., train delays, apartment viewing, doctor appointments, office small talk, returns at the post office, digital privacy, public transit disruptions, bakery orders).
+      - Do NOT pick generic default topics like general "small talk" or "eating out" unless forced by the seed.
+
+      STEP 2: CONTENT SELECTION
+      - Generate EXACTLY 5 German items specific to this chosen niche topic.
+      - Allowed format: Single words (nouns with article e.g., "die Kaltmiete") OR short phrases of 2 TO 3 WORDS MAX (e.g., "Bescheid geben", "Anschluss verpassen").
+      - CEFR Level: B1 to C1 (Umgangssprache / Alltagssprache).
+
+      CRITICAL CONSTRAINTS:
+      - STRICT WORD COUNT: NO ITEM CAN EXCEED 3 WORDS. Count each token as a word.
+      - BANNED: Complete sentences, full clauses, questions, or expressions longer than 3 words (e.g., "Wie sieht es bei dir aus?" is INVALID).
+
+      OUTPUT RULES:
+      - Respond ONLY with a valid JSON array of strings containing EXACTLY 5 items.
+      - Do NOT wrap in markdown code blocks like ```json. Return raw JSON array only.
+
+      EXAMPLE OUTPUT FORMAT:
+      [
+        "die Kaltmiete",
+        "etwas nachvollziehen",
+        "Bescheid geben",
+        "der Schienenersatzverkehr",
+        "Anschluss verpassen"
+      ]
+telegram:
+  bot-token: "${TELEGRAM_BOT_TOKEN}"
+  channel-id: "${TELEGRAM_CHANNEL_ID}"
+  owner-id: "${TELEGRAM_OWNER_ID}"
+
+commands:
+  - command: /add_term
+    callback: /on_word_provided
+  - command: /active_word_card
+  - command: /remove_term
+    callback: /on_term_selected_for_removal
+  - command: /preview_word_card
+  - command: /publish_word_card
+    callback: /on_word_card_publish_decided
+  - command: /purge_word_card
+
+
+news:
+  receiver-id: ${telegram.owner-id}
+  sources:
+    - feed-id: deutsche-welle-gesamt
+      feed-url: https://rss.dw.com/xml/rss-de-all
+      source-tag: dw

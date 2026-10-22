@@ -35,3 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Docker ###
+.env
+
+### Runtime state ###
+*.db
+/metadata-store/

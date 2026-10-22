@@ -7,6 +7,7 @@ import de.ansk98.fluentpipe.service.api.commands.SendNewsFeedCommand;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -30,6 +31,7 @@ import java.util.Optional;
  * @author ansk98
  */
 @Service
+@ConditionalOnProperty(prefix = "fluentpipe.news", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class RssFeedBootstrap {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RssFeedBootstrap.class);
@@ -65,8 +67,15 @@ public class RssFeedBootstrap {
     @Transactional(readOnly = true)
     void subscribeFeedsOnStartup() {
         newsSourceProperties.sources().forEach(feedSource -> {
-            if (metadataStore.get(feedSource.feedId()) == null) {
-                metadataStore.put(feedSource.feedId(), String.valueOf(Instant.now().minus(30, ChronoUnit.MINUTES).toEpochMilli()));
+            String lastSeen = metadataStore.get(feedSource.feedId());
+            if (lastSeen == null) {
+                Instant firstPublishSince = Instant.now().minus(30, ChronoUnit.MINUTES);
+                metadataStore.put(feedSource.feedId(), String.valueOf(firstPublishSince.toEpochMilli()));
+                LOGGER.info("Added new feed '{}' ({}): only items published after {} will be posted.",
+                        feedSource.feedId(), feedSource.feedUrl(), firstPublishSince);
+            } else {
+                LOGGER.info("Existing feed '{}' ({}): only items published after {} will be posted.",
+                        feedSource.feedId(), feedSource.feedUrl(), Instant.ofEpochMilli(Long.parseLong(lastSeen)));
             }
 
             this.bootSubscriptionFlow(feedSource);
