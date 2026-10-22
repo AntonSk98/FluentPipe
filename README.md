@@ -4,12 +4,12 @@
 
 FluentPipe is your personal language-learning publisher. It picks a topic, builds a themed
 vocabulary card, explains every word, turns the card into shareable images, narrates it with
-natural-sounding audio, and posts the whole package into your Telegram channel -- automatically, or
+natural-sounding audio, and posts the whole package into your Telegram channel, automatically or
 whenever you feel like publishing.
 
 No spreadsheets, no copy-pasting, no "I'll do it later". Just open Telegram and learn.
 
-**See it live: [join Daily Deutsch on Telegram](https://t.me/daily_deutsch_group)** -- the channel
+**See it live: [join Daily Deutsch on Telegram](https://t.me/daily_deutsch_group)**, the channel
 where FluentPipe publishes its cards every day.
 
 ![Java](https://img.shields.io/badge/Java-powered-orange)
@@ -21,7 +21,7 @@ where FluentPipe publishes its cards every day.
 ## What you get
 
 - **A fresh card, ready to consume.** Every entry comes with its translation, a short definition, a
-  usage-frequency rating and an example sentence in context -- not just a bare word list.
+  usage-frequency rating and an example sentence in context, not just a bare word list.
 - **Beautiful output, not plain text.** Cards are rendered as polished images that look great on
   mobile and can be forwarded or saved by your audience.
 - **Audio included.** Every card is spoken out loud, so you can learn on the go, hands-free.
@@ -136,7 +136,7 @@ docker compose down -v       # also delete persisted state
 Install the JDK version required by the Gradle toolchain (see `build.gradle`). Docker is only needed
 if you want to build the container.
 
-Create a `.env` as above, then export it -- Spring Boot does not read `.env` on its own:
+Create a `.env` as above, then export it, since Spring Boot does not read `.env` on its own:
 
 ```bash
 set -a; . ./.env; set +a
@@ -177,7 +177,7 @@ Optional feature toggles (all enabled by default):
 
 Models, prompts, schedules, feeds and channel settings live in `application.yml` and can be
 overridden the usual Spring way, for example through environment variables. Nothing is tied to a
-specific provider model or cadence -- change the configuration, not the code.
+specific provider model or cadence. Change the configuration, not the code.
 
 ## Under the hood (for geeks)
 
