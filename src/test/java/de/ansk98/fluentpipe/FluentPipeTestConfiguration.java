@@ -3,8 +3,6 @@ package de.ansk98.fluentpipe;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.metadata.MetadataStore;
-import org.springframework.integration.metadata.SimpleMetadataStore;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -28,8 +26,4 @@ public class FluentPipeTestConfiguration {
         return Mockito.mock(TelegramClient.class);
     }
 
-    @Bean
-    public MetadataStore metadataStore() {
-        return new SimpleMetadataStore();
-    }
 }

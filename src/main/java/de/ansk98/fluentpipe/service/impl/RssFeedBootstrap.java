@@ -15,10 +15,8 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.dsl.context.IntegrationFlowContext;
 import org.springframework.integration.feed.dsl.Feed;
-import org.springframework.integration.metadata.ConcurrentMetadataStore;
-import org.springframework.integration.metadata.MetadataStore;
+import org.springframework.integration.metadata.SimpleMetadataStore;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -38,7 +36,6 @@ public class RssFeedBootstrap {
 
     private final NewsSourceProperties newsSourceProperties;
     private final IntegrationFlowContext flowContext;
-    private final MetadataStore metadataStore;
     private final ApplicationEventPublisher eventPublisher;
 
     /**
@@ -46,47 +43,34 @@ public class RssFeedBootstrap {
      *
      * @param newsSourceProperties See {@link NewsSourceProperties}
      * @param flowContext          See {@link IntegrationFlowContext}
-     * @param metadataStore        See {@link ConcurrentMetadataStore}
      * @param eventPublisher       See {@link ApplicationEventPublisher}
      */
     public RssFeedBootstrap(NewsSourceProperties newsSourceProperties,
                             IntegrationFlowContext flowContext,
-                            MetadataStore metadataStore,
                             ApplicationEventPublisher eventPublisher) {
         this.newsSourceProperties = newsSourceProperties;
         this.flowContext = flowContext;
-        this.metadataStore = metadataStore;
         this.eventPublisher = eventPublisher;
     }
 
     /**
-     * Automatically hooks into the context startup event to reload and boot active
-     * feed pipelines that were preserved in persistent repository storage.
+     * Starts configured feed pipelines with a five-minute lookback and in-memory history.
      */
     @EventListener(ApplicationReadyEvent.class)
-    @Transactional(readOnly = true)
     void subscribeFeedsOnStartup() {
-        newsSourceProperties.sources().forEach(feedSource -> {
-            String lastSeen = metadataStore.get(feedSource.feedId());
-            if (lastSeen == null) {
-                Instant firstPublishSince = Instant.now().minus(30, ChronoUnit.MINUTES);
-                metadataStore.put(feedSource.feedId(), String.valueOf(firstPublishSince.toEpochMilli()));
-                LOGGER.info("Added new feed '{}' ({}): only items published after {} will be posted.",
-                        feedSource.feedId(), feedSource.feedUrl(), firstPublishSince);
-            } else {
-                LOGGER.info("Existing feed '{}' ({}): only items published after {} will be posted.",
-                        feedSource.feedId(), feedSource.feedUrl(), Instant.ofEpochMilli(Long.parseLong(lastSeen)));
-            }
-
-            this.bootSubscriptionFlow(feedSource);
-        });
+        newsSourceProperties.sources().forEach(this::bootSubscriptionFlow);
     }
 
     private void bootSubscriptionFlow(NewsSourceProperties.Source feedSource) {
+        Instant firstPublishSince = Instant.now().minus(5, ChronoUnit.MINUTES);
+        LOGGER.info("Starting feed '{}' ({}): only items published after {} will be posted.",
+                feedSource.feedId(), feedSource.feedUrl(), firstPublishSince);
+        var metadataStore = new SimpleMetadataStore();
+        metadataStore.put(feedSource.feedId(), String.valueOf(firstPublishSince.toEpochMilli()));
         IntegrationFlow flow = IntegrationFlow
                 .from(
                         Feed.inboundAdapter(feedSource.feedUrlAsURL(), feedSource.feedId()).metadataStore(metadataStore),
-                        e -> e.poller(Pollers.fixedDelay(Duration.ofMinutes(10)).transactional())
+                        e -> e.poller(Pollers.fixedDelay(Duration.ofMinutes(10)))
                 )
                 .<SyndEntry>handle((payload, _) -> {
                     var sendNewFeedCommand = new SendNewsFeedCommand(

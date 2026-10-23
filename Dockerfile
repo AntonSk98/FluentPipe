@@ -52,7 +52,7 @@ WORKDIR /app
 # WHY: Running containers as root is a major security risk. Setting up a dedicated
 # user (UID 1001) and ensuring it owns the data directory prevents permission errors at runtime.
 RUN useradd --system --uid 1001 --create-home app \
-    && mkdir -p /data/metadata-store \
+    && mkdir -p /data \
     && chown -R app:app /data
 
 # Copy only the compiled application artifact from the builder stage.

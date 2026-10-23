@@ -31,8 +31,7 @@ where FluentPipe publishes its cards every day.
   commands, and keep cards unpublished until you are happy with them.
 - **News on the side.** Curated RSS feeds are streamed into the same chat, formatted and ready to
   read.
-- **Built to last.** Vocabulary and feed state are persisted, so restarts and redeploys do not lose
-  anything or spam old articles.
+- **Persistent vocabulary.** Word cards survive restarts and redeploys.
 
 ## Who it is for
 
@@ -88,7 +87,6 @@ SPRING_AI_OPENAI_API_KEY=<your OpenAI key>
 TELEGRAM_BOT_TOKEN=<your bot token>
 TELEGRAM_CHANNEL_ID=<your target channel>
 TELEGRAM_OWNER_ID=<your numeric Telegram id>
-METADATA_STORE_BASE_DIR=<directory for feed history>
 EOF
 ```
 
@@ -165,7 +163,6 @@ Required values come from the environment; there are no production defaults.
 | `TELEGRAM_BOT_TOKEN` | Bot token from BotFather |
 | `TELEGRAM_CHANNEL_ID` | Channel that receives cards |
 | `TELEGRAM_OWNER_ID` | Numeric id of the only user allowed to command the bot |
-| `METADATA_STORE_BASE_DIR` | Directory for persisted feed history |
 
 Optional feature toggles (all enabled by default):
 
@@ -173,7 +170,6 @@ Optional feature toggles (all enabled by default):
 | --- | --- |
 | `fluentpipe.telegram.enabled=false` | Skip Telegram polling and client beans |
 | `fluentpipe.news.enabled=false` | Skip RSS flows and bootstrapping |
-| `fluentpipe.metadata-store.enabled=false` | Skip the file-backed feed metadata store |
 
 Models, prompts, schedules, feeds and channel settings live in `application.yml` and can be
 overridden the usual Spring way, for example through environment variables. Nothing is tied to a
@@ -185,7 +181,7 @@ content share the same clock regardless of the container's default UTC.
 ## Under the hood (for geeks)
 
 - **Spring Boot + Spring AI** for the orchestration and LLM integration
-- **Spring Integration feed adapters** for RSS ingestion, with file-backed feed history
+- **Spring Integration feed adapters** for RSS ingestion, with in-memory feed history
 - **Telegram Bots long polling** for updates and publishing
 - **SQLite + Spring Data JPA + Flyway** for word cards and schema migrations
 - **Thymeleaf + openhtmltopdf + PDFBox** to render HTML to PDF to PNG images
@@ -196,7 +192,7 @@ Exact dependency versions are declared in `build.gradle`.
 
 ```text
 src/main/java/de/ansk98/fluentpipe
-├── config/        configuration properties, metadata store, template engine
+├── config/        configuration properties, template engine
 ├── domain/        JPA entities
 ├── handler/       command/callback SPI, implementations, access filter
 ├── openai/        AI chat and speech adapter
@@ -214,8 +210,8 @@ src/main/resources
 ## Container image
 
 CI publishes `ghcr.io/antonsk98/fluentpipe:latest` on every push to the `production` branch. The
-container runs as a non-root user and keeps all mutable state under `/data`, so mount a volume
-there.
+container runs as a non-root user. Mount `/data` and use a SQLite JDBC URL pointing there
+to persist word cards. RSS history needs no directory or volume.
 
 ## License
 
