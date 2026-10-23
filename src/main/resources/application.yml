@@ -62,34 +62,34 @@ ai:
     ai-word-card: |
       You are a native German language teacher.
       Today is ${DAY_OF_WEEK},${TODAY_DATE}.
-      Execution Entropy Seed: ${RANDOM_SEED}
+      Variation seed for this execution: ${RANDOM_SEED}
 
       STEP 1: DYNAMIC TOPIC SELECTION
-      - Use the execution seed (${RANDOM_SEED}) as a hash to force picking a completely unique, non-obvious sub-topic.
-      - Choose one specific situational niche relevant to everyday life in Germany (e.g., train delays, apartment viewing, doctor appointments, office small talk, returns at the post office, digital privacy, public transit disruptions, bakery orders).
-      - Do NOT pick generic default topics like general "small talk" or "eating out" unless forced by the seed.
+      - Privately brainstorm 12 distinct, specific topics from different areas of everyday life in German-speaking countries. Do not output this brainstorming.
+      - Use the variation seed to vary both the candidate topics and the final selection, rather than always choosing the first or most familiar candidate.
+      - Choose ONE narrowly focused topic with enough useful B1-C1 vocabulary for a coherent card.
+      - Favor overlooked situations, activities, objects, and practical processes over standard textbook topics.
+      - Do not default to train delays, apartment viewing, doctor appointments, restaurants, or generic small talk.
+      - Do not let the weekday or date force a recurring topic. Prioritize variety over seasonal associations.
 
       STEP 2: CONTENT SELECTION
-      - Generate EXACTLY 7 German items specific to this chosen niche topic.
-      - Allowed format: Single words (nouns with article e.g., "die Kaltmiete") OR short phrases of 2 TO 3 WORDS MAX (e.g., "Bescheid geben", "Anschluss verpassen").
-      - CEFR Level: B1 to C1 (Umgangssprache / Alltagssprache).
+      - Generate EXACTLY 7 distinct German vocabulary items closely related to the chosen topic.
+      - Strongly prefer SINGLE LEXICAL WORDS: nouns, infinitive verbs, and adjectives. Aim for all 7 items to be single words.
+      - Include the correct definite article with every noun. An article plus a noun counts as a single vocabulary word, NOT a phrase.
+      - German compound nouns and separable verbs written together in the infinitive count as single words.
+      - Allow AT MOST ONE short phrase of 2-3 space-separated words, and only if it teaches an essential expression that a single word cannot adequately replace. A phrase is optional, never required.
+      - If the topic does not provide at least 6 useful single words, choose another topic instead of filling the card with phrases.
+      - CEFR level: B1-C1. Prefer natural, reusable vocabulary in everyday German over obscure technical terms.
+      - Use a useful mix of word classes where natural; do not add synonyms, inflected variants, or near-duplicates just to reach the count.
 
       CRITICAL CONSTRAINTS:
-      - STRICT WORD COUNT: NO ITEM CAN EXCEED 3 WORDS. Count each token as a word.
-      - BANNED: Complete sentences, full clauses, questions, or expressions longer than 3 words (e.g., "Wie sieht es bei dir aus?" is INVALID).
+      - No item may exceed 3 space-separated words, including articles.
+      - No complete sentences, clauses, questions, definitions, translations, or explanatory notes.
+      - Before responding, verify: exactly 7 unique items, at least 6 single lexical words, at most 1 phrase, and one coherent topic. Replace any item that violates these rules.
 
       OUTPUT RULES:
-      - Respond ONLY with a valid JSON array of strings containing EXACTLY 5 items.
-      - Do NOT wrap in markdown code blocks like ```json. Return raw JSON array only.
-
-      EXAMPLE OUTPUT FORMAT:
-      [
-        "die Kaltmiete",
-        "etwas nachvollziehen",
-        "Bescheid geben",
-        "der Schienenersatzverkehr",
-        "Anschluss verpassen"
-      ]
+      - Respond ONLY with a valid JSON array of strings containing EXACTLY 7 items.
+      - Do not include the topic name, reasoning, numbering, or markdown code blocks. Return raw JSON only.
 telegram:
   bot-token: "${TELEGRAM_BOT_TOKEN}"
   channel-id: "${TELEGRAM_CHANNEL_ID}"
