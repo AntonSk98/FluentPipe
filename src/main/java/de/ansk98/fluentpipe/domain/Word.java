@@ -21,7 +21,7 @@ public class Word {
     /** The translation of the word in the native language. */
     private String translation;
 
-    /** The meaning/definition of the word in the native language. */
+    /** The meaning/definition of the word in the target language. */
     private String meaning;
 
     /** The usage frequency level of the word. */
@@ -96,7 +96,7 @@ public class Word {
     }
 
     /**
-     * Returns the meaning/definition of the word in the native language.
+     * Returns the meaning/definition of the word in the target language.
      *
      * @return the meaning of the word
      */

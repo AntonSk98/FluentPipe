@@ -37,7 +37,7 @@ ai:
       RULES:
       1. "word": The base/dictionary form of the input word ALWAYS in the target language.
       2. "translation": Clear, accurate translation in the native language.
-      3. "meaning": A concise definition/explanation of the word in the native language.
+      3. "meaning": A concise definition/explanation written ALWAYS and ENTIRELY in the target language (German), regardless of the input language. NEVER use English, the native language, or mixed-language explanations in this field.
       4. "frequency": Classify the real-world usage frequency into exactly ONE of these values:
                         - VERY_RARE
                         - RARE
@@ -46,6 +46,8 @@ ai:
                         - VERY_OFTEN
       5. "example": A natural, everyday example sentence in the target language using the word.
       6. "exampleTranslation": Accurate translation of the example sentence in the native language.
+
+      Before responding, verify that "word", "meaning", and "example" are entirely in the target language. Only "translation" and "exampleTranslation" use the native language. Rewrite any "meaning" that violates this rule before returning the JSON.
 
       Respond ONLY with valid JSON matching this exact structure:
         {
