@@ -108,7 +108,7 @@ commands:
 
 
 news:
-  receiver-id: ${telegram.owner-id}
+  receiver-id: ${telegram.channel-id}
   sources:
     - feed-id: deutsche-welle-gesamt
       feed-url: https://rss.dw.com/xml/rss-de-all
