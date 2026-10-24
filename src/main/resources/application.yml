@@ -110,6 +110,6 @@ commands:
 news:
   receiver-id: ${telegram.owner-id}
   sources:
-    - feed-id: deutsche-welle-gesamt
-      feed-url: https://rss.dw.com/xml/rss-de-all
+    - feed-id: deutsche-welle-deutschland
+      feed-url: https://rss.dw.com/rdf/rss-de-deutschland
       source-tag: dw
