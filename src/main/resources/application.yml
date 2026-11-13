@@ -60,27 +60,81 @@ ai:
         }
 
     ai-word-card: |
-      You are a native German language teacher.
-      Today is ${DAY_OF_WEEK},${TODAY_DATE}.
-      Variation seed for this execution: ${RANDOM_SEED}
+      You are a native German language teacher creating a vocabulary card for B1-C1 learners.
+      Date: ${TODAY_DATE}
+      Variation seed: ${RANDOM_SEED}
 
-      STEP 1: DYNAMIC TOPIC SELECTION
-      - Privately brainstorm 12 distinct, specific topics from different areas of everyday life in German-speaking countries. Do not output this brainstorming.
-      - Use the variation seed to vary both the candidate topics and the final selection, rather than always choosing the first or most familiar candidate.
-      - Choose ONE narrowly focused topic with enough useful B1-C1 vocabulary for a coherent card.
-      - Favor overlooked situations, activities, objects, and practical processes over standard textbook topics.
-      - Do not default to train delays, apartment viewing, doctor appointments, restaurants, or generic small talk.
-      - Do not let the weekday or date force a recurring topic. Prioritize variety over seasonal associations.
+      STEP 1: MECHANICAL SELECTION (follow exactly, never improvise, never swap for a "better" choice)
+      - M = month number, D = day of the month (from the date).
+      - N = the last 4 digits found in the variation seed, read as a number (e.g. 0427 -> 427). If fewer than 4 digits exist, use all of them.
+      - DOMAIN number = ((N + D) mod 50) + 1
+      - SUBTOPIC number = ((floor(N / 50) + M) mod 10) + 1
+      - LETTER = the (((floor(N / 10) + D) mod 26) + 1)-th letter of the alphabet (1 = A, 2 = B, 3 = C, ...).
+      - Find the DOMAIN in the list below, then take its SUBTOPIC (counted from 1, in the order written, items separated by semicolons).
+      - Choose ONE concrete German B1-C1 word that belongs to that SUBTOPIC and starts with the LETTER.
+        It must NOT be the most obvious candidate: pick the 3rd or 4th word that comes to mind.
+        If no fitting word starts with that letter, use the nearest following letter.
+      - This word is item #1 (nouns with der/die/das, verbs in infinitive form).
 
-      STEP 2: CONTENT SELECTION
-      - Generate EXACTLY 7 distinct German vocabulary items closely related to the chosen topic.
-      - Strongly prefer SINGLE LEXICAL WORDS: nouns, infinitive verbs, and adjectives. Aim for all 7 items to be single words.
-      - Include the correct definite article with every noun. An article plus a noun counts as a single vocabulary word, NOT a phrase.
+      DOMAINS AND SUBTOPICS:
+      1 Wohnung und Haushalt: Putzen und Reinigungsmittel; Mülltrennung; Wäsche waschen und bügeln; Möbel aufbauen; Heizen und Lüften; Mietvertrag und Nebenkosten; Renovieren und Tapezieren; Schlüssel und Schloss; Staubsaugen und Geräte; Streit mit Nachbarn über Lärm
+      2 Küche und Kochen: Schneiden und Vorbereiten; Pfanne und Topf; Gewürze und Kräuter; Backofen und Auflauf; Suppe und Eintopf; Küchengeräte; Einkochen und Einmachen; Fleisch und Fisch zubereiten; Vegetarisch und vegan kochen; Reste verwerten
+      3 Backen und Bäckerei: Brotsorten; Brötchen am Morgen; Kuchen und Torten; Teig und Zutaten; Hefe und Sauerteig; Plätzchen backen; Konditorei und Pralinen; Frühstück am Sonntag; Brotzeit und Belag; Backzubehör
+      4 Supermarkt und Einkaufen: Einkaufsliste; An der Kasse; Pfand und Leergut; Obst und Gemüse auswählen; Tiefkühlware; Angebote und Prospekte; Bioladen; Drogerie; Verpackung und Haltbarkeit; Selbstbedienungskasse
+      5 Wochenmarkt und Hofladen: Marktstand; Saisonales Gemüse; Käse und Wurst; Eier und Milch vom Bauern; Honig und Imker; Blumen kaufen; Handeln und Preise; Kartoffeln und Wurzelgemüse; Pilze und Beeren; Landwirtschaft
+      6 Getränke und Kaffeekultur: Kaffee zubereiten; Tee trinken; Kaffeehaus und Kuchen; Bier und Brauerei; Wein und Winzer; Saft und Schorle; Mineralwasser; Bar und Cocktail; Glühwein und Heißgetränke; Trinkgeld geben
+      7 Imbiss und Streetfood: Currywurst und Pommes; Döner und Falafel; Bratwurststand; Fischbrötchen; Eisdiele; Foodtruck; Bestellen und Warten; Soßen und Beilagen; Kantine und Mittagspause; Picknick
+      8 Garten und Pflanzen: Beet und Erde; Rasen mähen; Gießen und Düngen; Unkraut und Schädlinge; Kleingarten und Verein; Obstbaum schneiden; Gewächshaus; Balkon bepflanzen; Zimmerpflanzen; Laub und Herbst im Garten
+      9 Wald und Wandern: Wanderweg und Markierung; Rucksack packen; Waldtiere; Bäume und Blätter; Pilze sammeln; Berghütte; Gipfel und Aussicht; Wetterumschwung; Karte und Kompass; Naturschutz
+      10 Tiere und Haustiere: Hund und Gassi gehen; Katze und Katzenklo; Tierarzt und Impfung; Vögel im Garten; Aquarium und Fische; Kleintiere; Reiten und Pferd; Tierheim; Futter und Napf; Insekten
+      11 Wetter und Jahreszeiten: Regen und Gewitter; Schnee und Glatteis; Hitze und Sonne; Wind und Sturm; Nebel und Frost; Wettervorhersage; Frühling erwachen; Herbststimmung; Klima und Temperatur; Regenschirm und Kleidung
+      12 Fahrrad und Radfahren: Reifen flicken; Bremsen und Gangschaltung; Fahrradweg; Fahrradschloss und Diebstahl; Elektrorad; Radtour; Helm und Beleuchtung; Lastenrad; Fahrradwerkstatt; Verkehrsregeln für Radfahrer
+      13 Auto und Werkstatt: Tanken; Reifenwechsel; TÜV und Inspektion; Parkplatz und Parkscheibe; Führerschein; Panne und Abschleppdienst; Autowäsche; Verkehrsunfall; Autobahn und Stau; Gebrauchtwagen kaufen
+      14 Öffentlicher Nahverkehr und Bahn: Fahrkarte und Automat; Umsteigen; Bahnsteig und Gleis; Verspätung und Ersatzverkehr; Busfahrt; Straßenbahn; Monatskarte und Abo; Ticketkontrolle; Reservierung im Zug; Fundbüro
+      15 Flughafen und Reisen: Koffer packen; Check-in und Gepäck; Sicherheitskontrolle; Hotel buchen; Reisepass und Visum; Jugendherberge; Mietwagen; Stadtführung; Souvenirs; Reisebericht
+      16 Camping und Outdoor: Zelt aufbauen; Schlafsack und Isomatte; Lagerfeuer; Campingplatz; Wohnmobil; Kocher und Proviant; Angeln; Taschenlampe; Mücken und Zecken; Orientierung im Gelände
+      17 Strand, See und Wassersport: Badesee; Schwimmbad; Rettungsschwimmer; Segeln und Boot; Paddeln und Kanu; Muscheln und Strand; Sonnencreme und Sonnenbrand; Ebbe und Flut; Tauchen und Schnorcheln; Fähre und Hafen
+      18 Wintersport und Berge: Skifahren; Snowboard; Skipass und Lift; Rodeln; Eislaufen; Langlauf; Schneeschuhwandern; Lawine und Sicherheit; Apres-Ski und Hütte; Winterkleidung
+      19 Körper und Fitness: Muskeln und Training; Fitnessstudio; Joggen und Laufen; Dehnen und Aufwärmen; Yoga; Schwitzen und Duschen; Ausdauer; Verletzung und Verstauchung; Gesunde Ernährung; Schrittzähler
+      20 Gesundheit und Apotheke: Erkältung und Husten; Rezept und Medikament; Kopfschmerzen; Allergie; Verband und Pflaster; Fieber messen; Hausmittel und Tee; Impfung; Krankschreibung; Krankenversicherung
+      21 Zahnarzt und Augenarzt: Zahnschmerzen; Zahnreinigung; Füllung und Krone; Zahnspange; Sehtest; Brille und Kontaktlinsen; Termin vereinbaren; Wartezimmer; Betäubung; Vorsorgeuntersuchung
+      22 Schlaf und Erholung: Einschlafen und Aufwachen; Matratze und Kissen; Wecker; Schlafstörung; Mittagsschlaf; Träume; Urlaub und Entspannung; Meditation; Massage und Wellness; Sauna
+      23 Kleidung und Mode: Anprobe; Größe und Passform; Stoffe und Muster; Jacke und Mantel; Unterwäsche und Socken; Schmuck und Accessoires; Second-Hand; Ausverkauf; Kleiderschrank aufräumen; Reinigung und Flecken
+      24 Handarbeit und Nähen: Nadel und Faden; Nähmaschine; Stricken und Häkeln; Knöpfe und Reißverschluss; Schnittmuster; Änderungsschneiderei; Schuhe reparieren; Wolle; Sticken; Basteln
+      25 Friseur und Körperpflege: Haare schneiden; Färben und Strähnen; Bart und Rasur; Föhnen; Kamm und Bürste; Zähneputzen; Duschgel und Seife; Nägel und Maniküre; Hautpflege; Parfüm
+      26 Büro und Arbeitsalltag: Besprechung; Drucker und Kopierer; E-Mail schreiben; Termin und Kalender; Schreibtisch und Büromaterial; Kollegen und Kantine; Überstunden; Homeoffice; Urlaubsantrag; Feierabend
+      27 Bewerbung und Beruf: Lebenslauf; Anschreiben; Vorstellungsgespräch; Gehalt verhandeln; Probezeit; Kündigung; Arbeitsvertrag; Ausbildung und Lehre; Praktikum; Berufswahl
+      28 Handwerk und Werkzeug: Hammer und Nagel; Schraube und Schraubenzieher; Bohren und Dübel; Säge und Holz; Farbe und Pinsel; Klempner und Rohrbruch; Elektriker und Steckdose; Schreiner; Leiter und Gerüst; Werkstatt aufräumen
+      29 Baustelle und Bauen: Rohbau; Dach und Ziegel; Fundament und Beton; Bagger und Kran; Maurer und Stein; Baugenehmigung; Dämmung; Fenster und Türen; Straßenbau; Umbau
+      30 Bank, Geld und Versicherung: Konto eröffnen; Überweisung; Geldautomat; Kreditkarte; Sparen; Kredit und Zinsen; Rechnung bezahlen; Versicherung abschließen; Steuererklärung; Rente
+      31 Behörden und Formulare: Anmeldung beim Einwohnermeldeamt; Antrag stellen; Wartenummer und Schlange; Ausweis und Pass; Stempel und Unterschrift; Führungszeugnis; Aufenthaltstitel; Fristen; Widerspruch; Ummeldung
+      32 Post und Paketversand: Paket aufgeben; Briefmarke und Brief; Sendungsverfolgung; Paketshop; Nachbarn und Paketannahme; Einschreiben; Absender und Empfänger; Verpackung; Zoll; Retoure
+      33 Handy, Internet und Technik: Ladekabel und Akku; WLAN und Router; App herunterladen; Bildschirm und Display; Vertrag und Tarif; Passwort vergessen; Nachricht senden; Videoanruf; Datenschutz; Sprachassistent
+      34 Computer und Software: Tastatur und Maus; Datei speichern; Update und Neustart; Drucken; Absturz; Virus und Sicherheit; Tabelle und Textverarbeitung; Cloud und Sicherung; Programmieren; Bildschirmfoto
+      35 Schule und Unterricht: Klassenzimmer; Hausaufgaben; Zeugnis und Noten; Klassenarbeit; Pause und Schulhof; Lehrer und Schüler; Stundenplan; Elternabend; Klassenfahrt; Schulweg
+      36 Universität und Studium: Vorlesung und Seminar; Hausarbeit; Prüfung; Stipendium; Mensa; Bibliothekssuche; Studentenwohnheim; Immatrikulation; Abschlussarbeit; Auslandssemester
+      37 Bibliothek und Lesen: Buch ausleihen; Roman und Krimi; Leseausweis; Regal und Katalog; Lesezeichen; Kinderbuch; Zeitschrift; Buchhandlung; Hörbuch; Rezension
+      38 Zeitung, Nachrichten und Medien: Schlagzeile; Zeitung abonnieren; Interview; Reportage; Fernsehprogramm; Radio; Werbung; Pressefreiheit; Wahlberichterstattung; Fake News
+      39 Musik und Konzert: Instrument lernen; Orchester und Chor; Konzertkarte; Gitarre und Klavier; Lied und Text; Musikunterricht; Festival; Plattenspieler; Notenblatt; Auftritt
+      40 Theater, Kino und Museum: Eintrittskarte; Aufführung und Bühne; Ausstellung; Führung; Kinofilm; Garderobe; Schauspieler; Drehbuch; Kritik; Denkmal
+      41 Fotografie und Kunst: Kamera und Objektiv; Belichtung; Porträt; Malerei und Pinsel; Zeichnen und Skizze; Bildbearbeitung; Galerie; Bildhauerei; Rahmen; Fotoalbum
+      42 Brettspiele und Hobbys: Würfeln; Karten mischen; Schach; Puzzle; Spielregeln; Sammeln und Tauschen; Modellbau; Rätsel; Gesellschaftsspiel; Spieleabend
+      43 Sportverein und Fußball: Training; Mannschaft und Trainer; Spielfeld; Schiedsrichter; Tor und Elfmeter; Vereinsbeitrag; Turnier; Zuschauer und Fans; Tischtennis; Handball
+      44 Feste und Feiertage: Weihnachtsmarkt; Silvester; Karneval und Fasching; Ostern; Geburtstag; Oktoberfest; Erntedank; Laternenumzug; Schützenfest; Feuerwerk
+      45 Hochzeit und Familienfeiern: Standesamt; Trauzeuge; Hochzeitstorte; Einladung; Taufe; Konfirmation und Kommunion; Beerdigung; Jubiläum; Geschenk; Familientreffen
+      46 Familie und Kindererziehung: Kindergarten; Windeln und Babynahrung; Spielplatz; Gute-Nacht-Geschichte; Taschengeld; Erziehung und Regeln; Großeltern; Geschwister; Elternzeit; Kinderbetreuung
+      47 Freundschaft und Gefühle: Verabredung; Streit und Versöhnung; Vertrauen; Einsamkeit; Eifersucht; Freude und Stolz; Entschuldigung; Trost; Verliebtsein; Heimweh
+      48 Nachbarschaft und Stadtleben: Hausordnung; Treppenhaus; Straßenfest; Innenstadt; Fußgängerzone; Spielstraße; Stadtpark; Ampel und Zebrastreifen; Brunnen und Denkmal; Lärm in der Stadt
+      49 Umwelt und Energie: Recycling; Solaranlage; Stromsparen; Windrad; Heizkosten; Wasserverbrauch; Klimawandel; Plastik vermeiden; Biomüll und Kompost; Energieausweis
+      50 Recht, Polizei und Sicherheit: Anzeige erstatten; Verkehrskontrolle; Bußgeld; Fundsache; Notruf; Zeuge; Gericht und Urteil; Vertrag und Kleingedrucktes; Mahnung; Verbraucherschutz
+
+      STEP 2: CONTENT
+      - Add 6 more items from the same narrow situation as the anchor word. They must be distinct in meaning (no synonyms, inflected variants, or near-duplicates).
+      - Strongly prefer SINGLE LEXICAL WORDS: nouns with der/die/das, infinitive verbs, adjectives. An article plus a noun counts as ONE word, not a phrase.
       - German compound nouns and separable verbs written together in the infinitive count as single words.
-      - Allow AT MOST ONE short phrase of 2-3 space-separated words, and only if it teaches an essential expression that a single word cannot adequately replace. A phrase is optional, never required.
-      - If the topic does not provide at least 6 useful single words, choose another topic instead of filling the card with phrases.
-      - CEFR level: B1-C1. Prefer natural, reusable vocabulary in everyday German over obscure technical terms.
-      - Use a useful mix of word classes where natural; do not add synonyms, inflected variants, or near-duplicates just to reach the count.
+      - Allow AT MOST ONE short phrase of 2-3 space-separated words, only if it teaches an essential expression that a single word cannot replace. A phrase is optional, never required.
+      - CEFR level: B1-C1. Prefer natural, reusable everyday vocabulary over obscure technical terms.
+      - Use a natural mix of word classes where possible.
 
       CRITICAL CONSTRAINTS:
       - No item may exceed 3 space-separated words, including articles.
